@@ -237,5 +237,4 @@ def delete_reservation(id):
     return make_response({'message': 'Reservation successfully deleted'}, 202)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5555)) 
-    app.run(host="0.0.0.0", port=port,debug=True)
+    app.run(debug=True)
