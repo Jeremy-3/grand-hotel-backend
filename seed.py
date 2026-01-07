@@ -1,5 +1,5 @@
 from app import app
-from models import db, Guest, Rooms, Reservation
+from models import db, Guest, Rooms, Reservation,User
 from datetime import datetime, timedelta
 
 def seed_data():
@@ -8,6 +8,7 @@ def seed_data():
         db.session.query(Reservation).delete()
         db.session.query(Rooms).delete()
         db.session.query(Guest).delete()
+        db.session.query(User).delete()
         db.session.commit()
 
         # Seed guests
@@ -65,7 +66,16 @@ def seed_data():
                 room_id=rooms[2].id
             )
         ]
+
+
         db.session.add_all(reservations)
+        db.session.commit()
+
+        user = [
+            User(username='admin', password='admin123', role='admin'),
+            User(username='Walice', password='user123', role='user')
+        ]
+        db.session.add_all(user)
         db.session.commit()
 
 seed_data()
