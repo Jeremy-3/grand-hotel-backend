@@ -72,8 +72,8 @@ def seed_data():
         db.session.commit()
 
         user = [
-            User(username='admin', password='admin123', role='admin'),
-            User(username='Walice', password='user123', role='user')
+            User(username='admin', password_hash='admin123', role='admin'),
+            User(username='Walice', password_hash='user123', role='user')
         ]
         db.session.add_all(user)
         db.session.commit()
