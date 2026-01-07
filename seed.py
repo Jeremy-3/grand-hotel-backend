@@ -1,7 +1,7 @@
 from app import app
 from models import db, Guest, Rooms, Reservation,User
 from datetime import datetime, timedelta
-
+from werkzeug.security import generate_password_hash
 def seed_data():
     with app.app_context():
         # Delete existing data
@@ -71,11 +71,19 @@ def seed_data():
         db.session.add_all(reservations)
         db.session.commit()
 
-        user = [
-            User(username='admin', password_hash='admin123', role='admin'),
-            User(username='Walice', password_hash='user123', role='user')
+        users = [
+            User(
+                username='admin',
+                password_hash=generate_password_hash('admin123'),
+                role='admin'
+            ),
+            User(
+                username='Walice',
+                password_hash=generate_password_hash('user123'),
+                role='user'
+            )
         ]
-        db.session.add_all(user)
+        db.session.add_all(users)
         db.session.commit()
 
 seed_data()

@@ -74,6 +74,13 @@ def login():
     access_token = create_access_token(identity=username)
     return jsonify(access_token=access_token), 200
 
+
+
+
+
+
+
+
 # CRUD for Guests
 @app.route('/guests', methods=['GET'])
 @jwt_required()
