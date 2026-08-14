@@ -1,4 +1,4 @@
-#!/home/elvis/group-propject-backend/venv/bin/python3.12
+#!/home/jeremy/projects/myProjects/grand-hotel-backend/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
