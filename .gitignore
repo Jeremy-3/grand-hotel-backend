@@ -26,11 +26,5 @@ dine-dash-postman.json
 *.sln
 *.sw?
 
-# files from the old project structure
-models.py
-Pipfile
-Pipfile.lock
-hotel.db
-seed.py
-app.py
+
 
