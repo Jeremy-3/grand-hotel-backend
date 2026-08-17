@@ -85,6 +85,8 @@ class PaymentOut(BaseModel):
     payment_method: str
     checkout_request_id:Optional[str] = None   
     mpesa_receipt:Optional[str] = None
+    tx_ref:Optional[str] = None
+    payment_status: str
     paid_at: Optional[datetime] = None
     created_at: str
     updated_at: str
