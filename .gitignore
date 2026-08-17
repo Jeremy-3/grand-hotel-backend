@@ -14,7 +14,6 @@ dist-ssr
 
 .env
 venv
-
 dine-dash-postman.json
 # Editor directories and files
 .vscode/*
@@ -26,6 +25,3 @@ dine-dash-postman.json
 *.njsproj
 *.sln
 *.sw?
-
-
-
