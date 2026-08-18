@@ -7,6 +7,8 @@ from sqlalchemy.dialects.postgresql import UUID
 
 
 class Guests(Base):
+    __tablename__ = "guests"
+    
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     uid = Column(UUID(as_uuid=True), unique=True, nullable=False, server_default=text("gen_random_uuid()"))
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
@@ -17,7 +19,7 @@ class Guests(Base):
     
     # relationships
     user = relationship("Users", back_populates="guest")
-    reservation = relationship("Reservations", back_populates="guest")
+    reservations = relationship("Reservations", back_populates="guest")
     
     
     

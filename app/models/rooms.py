@@ -7,10 +7,12 @@ from sqlalchemy.dialects.postgresql import UUID
 
 
 class Rooms(Base):
+    __tablename__ = "rooms"
+    
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     uid = Column(UUID(as_uuid=True), unique=True, nullable=False, server_default=text("gen_random_uuid()"))
     room_number = Column(Integer, unique=True, nullable=False)
-    room_type_id = Column(Integer, ForeignKey("room_types.id", ondelete="RESTRICT"), nullable=True)
+    room_type_id = Column(Integer, ForeignKey("room_types.id", ondelete="RESTRICT"), nullable=False)
     room_availability = Column(String, nullable=False, default="available")
     status = Column(Boolean, default=True)
     image = Column(String, nullable=False)  
@@ -18,6 +20,7 @@ class Rooms(Base):
     updated_at = Column(TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
     
     # relationships
-    reservation = relationship("Reservations", back_populates="room")
+    reservations = relationship("Reservations", back_populates="room")
     room_type = relationship("RoomTypes", back_populates="rooms")
     
+    users = rel

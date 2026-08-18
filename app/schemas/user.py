@@ -10,6 +10,12 @@ class UserBase(BaseModel):
     phone_number: str
     role_id: int
 
+
+class UserCreateDB(BaseModel):
+    name: str
+    email: EmailStr
+    password_hash: str
+    role_id: int | None = None
     
 class UserCreate(BaseModel):
     name:str

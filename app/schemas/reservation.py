@@ -4,13 +4,14 @@ from uuid import UUID
 from app.schemas.constants import RESERVATION_STATUSES
 from app.schemas.guest import GuestOut
 from app.schemas.room import RoomOut
+from datetime import datetime
 
 
 class ReservationBase(BaseModel):
     guest_id: int
     room_id: int
-    check_in_date: str
-    check_out_date: str
+    check_in_date: datetime
+    check_out_date: datetime
     status: Optional[str] = "pending"
     room_price_per_night: int
     deposit_percentage: int
