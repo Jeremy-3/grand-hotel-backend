@@ -4,6 +4,7 @@ from uuid import UUID
 from app.schemas.constants import RESERVATION_STATUSES
 from app.schemas.guest import GuestOut
 from app.schemas.room import RoomOut
+from app.schemas.payments import PaymentOut
 from datetime import datetime
 
 
@@ -58,6 +59,7 @@ class ReservationOut(ReservationBase):
     uid: UUID
     guest: GuestOut = None
     room: RoomOut = None
+    payments: list[PaymentOut] = []
     created_at: datetime
     updated_at: datetime
 

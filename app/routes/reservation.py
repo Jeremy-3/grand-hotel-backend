@@ -29,7 +29,7 @@ def get_reservations(
         db,
         page=page,
         limit=limit,
-        relationships=["room", "guest"],
+        relationships=["room", "guest", "payments"],
     )
     return ResponseModel(data=records, total=total)
 
@@ -45,9 +45,17 @@ def get_reservations(
 def create_reservation(
     payload: ReservationCreate,
     payment_method: str = Query(..., description="mpesa / card / cash / bank_transfer"),
+    payment_type: str = Query("deposit", pattern="^(deposit|full_payment)$"),
+    skip_payment: bool = Query(False),
     db: Session = Depends(get_db),
 ):
-    reservation = crud_reservation.create_reservation(db, payload, payment_method)
+    reservation = crud_reservation.create_reservation(
+        db,
+        payload,
+        payment_method,
+        payment_type=payment_type,
+        skip_payment=skip_payment,
+    )
     return ResponseModel(data=reservation, message="Reservation created successfully")
 
 

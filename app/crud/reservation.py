@@ -76,6 +76,8 @@ class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
         db: Session,
         record_create: ReservationCreate,
         payment_method: str,
+        payment_type: str = "deposit",
+        skip_payment: bool = False,
     ) -> Reservations:
         # Step 1 — guest exists
         guest = db.query(Guests).filter(Guests.id == record_create.guest_id).first()
@@ -113,9 +115,8 @@ class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
             )
 
         nights = (check_out_dt.date() - check_in_dt.date()).days
-        deposit_amount = round(
-            room_type.price_per_night * nights * room_type.deposit_percentage / 100
-        )
+        total_amount = room_type.price_per_night * nights
+        deposit_amount = round(total_amount * room_type.deposit_percentage / 100)
         payment_due_at = datetime.now(timezone.utc) + timedelta(
             days=PENDING_RESERVATION_TIMEOUT_DAYS
         )
@@ -130,25 +131,32 @@ class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
             room_price_per_night=room_type.price_per_night,
             deposit_percentage=room_type.deposit_percentage,
             deposit_amount=deposit_amount,
-            total_amount=room_type.price_per_night * nights,
+            total_amount=total_amount,
         )
 
         try:
             db.add(db_obj)
             db.flush()  # assigns db_obj.id without committing yet
 
-            payment = Payment(
-                reservation_id=db_obj.id,
-                amount=deposit_amount,
-                payment_type="deposit",
-                payment_method=payment_method,
-                payment_status="pending",
-            )
-            db.add(payment)
+            payment = None
+            if not skip_payment:
+                payment = Payment(
+                    reservation_id=db_obj.id,
+                    amount=(
+                        total_amount
+                        if payment_type == "full_payment"
+                        else deposit_amount
+                    ),
+                    payment_type=payment_type,
+                    payment_method=payment_method,
+                    payment_status="pending",
+                )
+                db.add(payment)
 
             db.commit()
             db.refresh(db_obj)
-            db.refresh(payment)
+            if payment:
+                db.refresh(payment)
         except SQLAlchemyError:
             db.rollback()
             raise HTTPException(500, "Failed to create reservation")
@@ -173,7 +181,7 @@ class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
             page=page,
             limit=limit,
             filters=[{"field": "guest_id", "value": guest_id}],
-            relationships=["room", "guest"],
+            relationships=["room", "guest", "payments"],
         )
 
     # ------------------------------------------------------------
@@ -239,6 +247,17 @@ class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
         return self._transition(db, uid, ("confirmed",), "checked_in")
 
     def check_out(self, db: Session, uid: UUID) -> Reservations:
+        reservation = self.get_reservation(db, uid)
+        paid_amount = sum(
+            float(payment.amount)
+            for payment in reservation.payments
+            if payment.payment_status == "paid"
+        )
+        if paid_amount < reservation.total_amount:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                "Cannot check out until the reservation is fully paid",
+            )
         return self._transition(db, uid, ("checked_in",), "checked_out")
 
     def cancel_reservation(self, db: Session, uid: UUID) -> Reservations:

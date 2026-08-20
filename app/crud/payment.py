@@ -39,7 +39,9 @@ class CRUDPayment(CRUDBase[MODEL, PaymentCreate]):
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Payment not found")
         return payment
 
-    def get_reservation_payments(self, db: Session, reservation_id: int, page: int = 1, limit: int = 10):
+    def get_reservation_payments(
+        self, db: Session, reservation_id: int, page: int = 1, limit: int = 10
+    ):
         return self.read(
             db,
             page=page,
@@ -50,7 +52,9 @@ class CRUDPayment(CRUDBase[MODEL, PaymentCreate]):
     # ------------------------------------------------------------
     # update (generic field edits - amount, method, phone, etc.)
     # ------------------------------------------------------------
-    def update_payment(self, db: Session, uid: UUID, record_in: PaymentUpdate) -> Payment:
+    def update_payment(
+        self, db: Session, uid: UUID, record_in: PaymentUpdate
+    ) -> Payment:
         payment = self.get_payment(db, uid)
 
         if payment.payment_status in ("paid", "refunded"):
@@ -76,7 +80,7 @@ class CRUDPayment(CRUDBase[MODEL, PaymentCreate]):
         payment = self.get_payment(db, uid)
 
         if payment.payment_status == "paid":
-            if payment.payment_type == "deposit":
+            if payment.payment_type in ("deposit", "full_payment"):
                 reservation = (
                     db.query(Reservations)
                     .filter(Reservations.id == payment.reservation_id)
@@ -86,7 +90,9 @@ class CRUDPayment(CRUDBase[MODEL, PaymentCreate]):
                     crud_reservation.confirm_reservation(db, reservation.uid)
             return payment
         if payment.payment_status == "refunded":
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Cannot confirm a refunded payment")
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST, "Cannot confirm a refunded payment"
+            )
 
         payment.payment_status = "paid"
         payment.paid_at = datetime.now(timezone.utc)
@@ -105,7 +111,7 @@ class CRUDPayment(CRUDBase[MODEL, PaymentCreate]):
 
         # If this was the deposit payment and the reservation is still
         # pending on it, move the reservation to confirmed automatically.
-        if payment.payment_type == "deposit":
+        if payment.payment_type in ("deposit", "full_payment"):
             reservation = (
                 db.query(Reservations)
                 .filter(Reservations.id == payment.reservation_id)
@@ -121,7 +127,10 @@ class CRUDPayment(CRUDBase[MODEL, PaymentCreate]):
         payment = self.get_payment(db, uid)
 
         if payment.payment_status == "paid":
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Cannot fail a payment already marked as paid")
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                "Cannot fail a payment already marked as paid",
+            )
 
         payment.payment_status = "failed"
         db.commit()
@@ -132,7 +141,9 @@ class CRUDPayment(CRUDBase[MODEL, PaymentCreate]):
         payment = self.get_payment(db, uid)
 
         if payment.payment_status != "paid":
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Only paid payments can be refunded")
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST, "Only paid payments can be refunded"
+            )
 
         payment.payment_status = "refunded"
         db.commit()

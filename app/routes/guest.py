@@ -8,6 +8,8 @@ from app.crud.user import crud_user
 from app.schemas.guest import GuestCreate, GuestRegistration, GuestUpdate, GuestOut
 from app.schemas.user import UserCreate
 from app.core.constants import ROLE_GUEST_ID
+from app.models.users import Users
+from app.models.guests import Guests
 from app.schemas.response import ResponseModel
 from app.dependencies.rbac import require_permission
 
@@ -20,6 +22,19 @@ router = APIRouter(prefix="/guests", tags=["Guests"])
     dependencies=[Depends(require_permission("guest.create"))],
 )
 def register_guest(payload: GuestRegistration, db: Session = Depends(get_db)):
+    existing_user = db.query(Users).filter(Users.email == payload.email).first()
+    if existing_user:
+        existing_guest = (
+            db.query(Guests).filter(Guests.user_id == existing_user.id).first()
+        )
+        if existing_guest:
+            return ResponseModel(data=existing_guest, message="Existing guest selected")
+        guest = crud_guest.create_guest_profile(
+            db,
+            GuestCreate(user_id=existing_user.id, status="active"),
+        )
+        return ResponseModel(data=guest, message="Guest profile created")
+
     user = crud_user.create_user(
         db,
         UserCreate(
@@ -63,8 +78,9 @@ def get_guests(
     limit: int = Query(10, ge=1, le=100),
 ):
     guests, total = crud_guest.read(db, page=page, limit=limit)
-    return ResponseModel(data=guests, message="Guests retrieved successfully", total=total)
-
+    return ResponseModel(
+        data=guests, message="Guests retrieved successfully", total=total
+    )
 
 
 @router.put(
@@ -89,6 +105,3 @@ def get_guest(uid: UUID, db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND, detail="Guest not found"
         )
     return ResponseModel(data=guest, message="Guest retrieved successfully")
-
-
-
