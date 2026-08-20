@@ -58,8 +58,8 @@ class ReservationOut(ReservationBase):
     uid: UUID
     guest: GuestOut = None
     room: RoomOut = None
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     model_config = {
         "from_attributes": True,

@@ -4,11 +4,37 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.crud.guest import crud_guest
-from app.schemas.guest import GuestCreate, GuestUpdate, GuestOut
+from app.crud.user import crud_user
+from app.schemas.guest import GuestCreate, GuestRegistration, GuestUpdate, GuestOut
+from app.schemas.user import UserCreate
+from app.core.constants import ROLE_GUEST_ID
 from app.schemas.response import ResponseModel
 from app.dependencies.rbac import require_permission
 
 router = APIRouter(prefix="/guests", tags=["Guests"])
+
+
+@router.post(
+    "/register",
+    response_model=ResponseModel[GuestOut],
+    dependencies=[Depends(require_permission("guest.create"))],
+)
+def register_guest(payload: GuestRegistration, db: Session = Depends(get_db)):
+    user = crud_user.create_user(
+        db,
+        UserCreate(
+            name=payload.name,
+            email=payload.email,
+            phone_number=payload.phone_number,
+            password=payload.password,
+            role_id=ROLE_GUEST_ID,
+        ),
+    )
+    guest = crud_guest.create_guest_profile(
+        db,
+        GuestCreate(user_id=user.id, status="active"),
+    )
+    return ResponseModel(data=guest, message="Guest registered successfully")
 
 
 @router.post(

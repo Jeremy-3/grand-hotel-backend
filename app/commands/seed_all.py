@@ -24,6 +24,7 @@ development and testing. They are not production transactions.
 
 from datetime import datetime
 
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
 from app.core.config import settings
@@ -57,10 +58,42 @@ from app.models.rooms import Rooms
 from app.models.reservations import Reservations
 from app.models.payments import Payment
 
+SEQUENCE_MODELS = (
+    Roles,
+    Permissions,
+    RolePermission,
+    Users,
+    Managers,
+    Guests,
+    RoomTypes,
+    Rooms,
+    Reservations,
+    Payment,
+)
+
+
+def sync_primary_key_sequences(db):
+    """Move PostgreSQL ID sequences past the highest existing ID."""
+    for model in SEQUENCE_MODELS:
+        table_name = model.__table__.name
+        quoted_table_name = '"' + table_name.replace('"', '""') + '"'
+        db.execute(
+            text(
+                "SELECT setval("
+                "pg_get_serial_sequence(:table_name, 'id'), "
+                f"COALESCE((SELECT MAX(id) FROM {quoted_table_name}), 1), "
+                f"(SELECT MAX(id) FROM {quoted_table_name}) IS NOT NULL"
+                ")"
+            ),
+            {"table_name": table_name},
+        )
+    db.commit()
+
 
 # ============================================================
 # GENERIC SEED FUNCTION
 # ============================================================
+
 
 def seed_table(
     db,
@@ -113,6 +146,7 @@ def seed_table(
 # ROLE PERMISSIONS
 # ============================================================
 
+
 def seed_role_permissions(db):
     """
     Create role-permission relationships.
@@ -149,14 +183,13 @@ def seed_role_permissions(db):
 
     db.commit()
 
-    print(
-        f"✓ Created {created} role-permission mappings"
-    )
+    print(f"✓ Created {created} role-permission mappings")
 
 
 # ============================================================
 # SUPERADMIN
 # ============================================================
+
 
 def seed_superadmin(db):
     """
@@ -175,10 +208,7 @@ def seed_superadmin(db):
 
     if not settings.SUPERADMIN_EMAIL:
 
-        print(
-            "⚠️ SUPERADMIN_EMAIL not set, "
-            "skipping SUPERADMIN creation"
-        )
+        print("⚠️ SUPERADMIN_EMAIL not set, " "skipping SUPERADMIN creation")
 
         return
 
@@ -186,19 +216,11 @@ def seed_superadmin(db):
     # Check existing user
     # --------------------------------------------------------
 
-    exists = (
-        db.query(Users)
-        .filter(
-            Users.email == settings.SUPERADMIN_EMAIL
-        )
-        .first()
-    )
+    exists = db.query(Users).filter(Users.email == settings.SUPERADMIN_EMAIL).first()
 
     if exists:
 
-        print(
-            "✅ SUPERADMIN already exists, skipping"
-        )
+        print("✅ SUPERADMIN already exists, skipping")
 
         return
 
@@ -221,15 +243,13 @@ def seed_superadmin(db):
 
     db.refresh(user)
 
-    print(
-        f"✓ SUPERADMIN created: "
-        f"{settings.SUPERADMIN_EMAIL}"
-    )
+    print(f"✓ SUPERADMIN created: " f"{settings.SUPERADMIN_EMAIL}")
 
 
 # ============================================================
 # MANAGERS
 # ============================================================
+
 
 def seed_managers(db):
     """
@@ -251,13 +271,7 @@ def seed_managers(db):
         # Check existing manager
         # ----------------------------------------------------
 
-        exists = (
-            db.query(Managers)
-            .filter(
-                Managers.user_id == user_id
-            )
-            .first()
-        )
+        exists = db.query(Managers).filter(Managers.user_id == user_id).first()
 
         if exists:
             continue
@@ -270,14 +284,13 @@ def seed_managers(db):
 
     db.commit()
 
-    print(
-        f"✓ Inserted {created} managers"
-    )
+    print(f"✓ Inserted {created} managers")
 
 
 # ============================================================
 # GUESTS
 # ============================================================
+
 
 def seed_guests(db):
     """
@@ -294,13 +307,7 @@ def seed_guests(db):
 
         user_id = row.get("user_id")
 
-        exists = (
-            db.query(Guests)
-            .filter(
-                Guests.user_id == user_id
-            )
-            .first()
-        )
+        exists = db.query(Guests).filter(Guests.user_id == user_id).first()
 
         if exists:
             continue
@@ -313,15 +320,13 @@ def seed_guests(db):
 
     db.commit()
 
-    print(
-        f"✓ Inserted {created} guests"
-    )
-
+    print(f"✓ Inserted {created} guests")
 
 
 # ============================================================
 # USERS
 # ============================================================
+
 
 def seed_users(db):
     """Seed demo users and hash their development passwords."""
@@ -335,11 +340,7 @@ def seed_users(db):
         exists = db.get(Users, user_id) if user_id is not None else None
 
         if not exists and email:
-            exists = (
-                db.query(Users)
-                .filter(Users.email == email)
-                .first()
-            )
+            exists = db.query(Users).filter(Users.email == email).first()
 
         if exists:
             continue
@@ -364,6 +365,7 @@ def seed_users(db):
 # RESERVATIONS
 # ============================================================
 
+
 def seed_reservations(db):
     """
     Seed default reservations after guests, room types and rooms.
@@ -374,46 +376,29 @@ def seed_reservations(db):
     print("Seeding reservations...")
     created = 0
 
-    reservation_columns = {
-        column.name
-        for column in Reservations.__table__.columns
-    }
+    reservation_columns = {column.name for column in Reservations.__table__.columns}
 
     for row in DEFAULT_RESERVATIONS:
         reservation_id = row.get("id")
 
-        if reservation_id is not None and db.get(
-            Reservations, reservation_id
-        ):
+        if reservation_id is not None and db.get(Reservations, reservation_id):
             continue
 
         guest_id = row["guest_id"]
         room_id = row["room_id"]
 
-        guest = (
-            db.query(Guests)
-            .filter(Guests.id == guest_id)
-            .first()
-        )
+        guest = db.query(Guests).filter(Guests.id == guest_id).first()
         if not guest:
             raise ValueError(
                 f"Reservation {reservation_id}: guest {guest_id} not found"
             )
 
-        room = (
-            db.query(Rooms)
-            .filter(Rooms.id == room_id)
-            .first()
-        )
+        room = db.query(Rooms).filter(Rooms.id == room_id).first()
         if not room:
-            raise ValueError(
-                f"Reservation {reservation_id}: room {room_id} not found"
-            )
+            raise ValueError(f"Reservation {reservation_id}: room {room_id} not found")
 
         room_type = (
-            db.query(RoomTypes)
-            .filter(RoomTypes.id == room.room_type_id)
-            .first()
+            db.query(RoomTypes).filter(RoomTypes.id == room.room_type_id).first()
         )
         if not room_type:
             raise ValueError(
@@ -427,14 +412,10 @@ def seed_reservations(db):
         nights = (check_out.date() - check_in.date()).days
 
         if nights <= 0:
-            raise ValueError(
-                f"Reservation {reservation_id}: invalid stay dates"
-            )
+            raise ValueError(f"Reservation {reservation_id}: invalid stay dates")
 
         total_amount = room_type.price_per_night * nights
-        deposit_amount = round(
-            total_amount * room_type.deposit_percentage / 100
-        )
+        deposit_amount = round(total_amount * room_type.deposit_percentage / 100)
 
         reservation_data = {
             "id": reservation_id,
@@ -465,42 +446,33 @@ def seed_reservations(db):
 # Payment
 # ============================================================
 
+
 def seed_Payment(db):
     """Seed default payment records after reservations exist."""
     print("Seeding Payment...")
     created = 0
 
-    payment_columns = {
-        column.name
-        for column in Payment.__table__.columns
-    }
+    payment_columns = {column.name for column in Payment.__table__.columns}
 
     for row in DEFAULT_PAYMENTS:
         payment_id = row.get("id")
 
-        if payment_id is not None and db.get(
-            Payment, payment_id
-        ):
+        if payment_id is not None and db.get(Payment, payment_id):
             continue
 
         reservation_id = row.get("reservation_id")
 
         reservation = (
-            db.query(Reservations)
-            .filter(Reservations.id == reservation_id)
-            .first()
+            db.query(Reservations).filter(Reservations.id == reservation_id).first()
         )
 
         if not reservation:
             raise ValueError(
-                f"Payment {payment_id}: "
-                f"reservation {reservation_id} not found"
+                f"Payment {payment_id}: " f"reservation {reservation_id} not found"
             )
 
         payment_data = {
-            key: value
-            for key, value in row.items()
-            if key in payment_columns
+            key: value for key, value in row.items() if key in payment_columns
         }
 
         db.add(Payment(**payment_data))
@@ -514,6 +486,7 @@ def seed_Payment(db):
 # MAIN SEED
 # ============================================================
 
+
 def seed_all():
 
     print("\n" + "=" * 60)
@@ -526,10 +499,7 @@ def seed_all():
 
     if not settings.DATABASE_URL:
 
-        print(
-            "❌ DATABASE_URL not set, "
-            "skipping all seeding"
-        )
+        print("❌ DATABASE_URL not set, " "skipping all seeding")
 
         return
 
@@ -548,6 +518,9 @@ def seed_all():
     with db_context() as db:
 
         try:
+            # Repair sequences before inserting explicit seed IDs. This also
+            # fixes databases that already experienced sequence drift.
+            sync_primary_key_sequences(db)
 
             # =================================================
             # RBAC
@@ -664,24 +637,21 @@ def seed_all():
 
             seed_Payment(db)
 
+            sync_primary_key_sequences(db)
+
             # =================================================
             # COMPLETE
             # =================================================
 
             print("\n" + "=" * 60)
-            print(
-                "✓ GRAND HOTEL DATABASE SEEDING "
-                "COMPLETED SUCCESSFULLY"
-            )
+            print("✓ GRAND HOTEL DATABASE SEEDING " "COMPLETED SUCCESSFULLY")
             print("=" * 60 + "\n")
 
         except IntegrityError as e:
 
             db.rollback()
 
-            print(
-                "✗ Integrity error during seeding"
-            )
+            print("✗ Integrity error during seeding")
 
             raise e
 
@@ -689,9 +659,7 @@ def seed_all():
 
             db.rollback()
 
-            print(
-                f"✗ Seeding failed: {str(e)}"
-            )
+            print(f"✗ Seeding failed: {str(e)}")
 
             raise
 

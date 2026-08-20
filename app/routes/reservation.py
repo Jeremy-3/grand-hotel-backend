@@ -24,6 +24,7 @@ def get_reservations(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
 ):
+    crud_reservation.expire_pending_reservations(db)
     records, total = crud_reservation.read(
         db,
         page=page,
@@ -64,6 +65,7 @@ def get_guest_reservations(
     limit: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
+    crud_reservation.expire_pending_reservations(db)
     records, total = crud_reservation.get_guest_reservations(db, guest_id, page, limit)
     return ResponseModel(data=records, total=total)
 

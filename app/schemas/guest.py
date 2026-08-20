@@ -21,6 +21,13 @@ class GuestCreate(GuestBase):
     pass
 
 
+class GuestRegistration(BaseModel):
+    name: str
+    email: str
+    phone_number: str
+    password: str
+
+
 class GuestUpdate(BaseModel):
     status: Optional[str] = None
 
