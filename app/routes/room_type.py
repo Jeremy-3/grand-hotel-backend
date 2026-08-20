@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
 
@@ -26,8 +26,12 @@ def create_room_type(payload: RoomTypeCreate, db: Session = Depends(get_db)):
     response_model=ResponseModel[list[RoomTypeOut]],
     dependencies=[Depends(require_permission("room_types.view"))],
 )
-def get_room_types(db: Session = Depends(get_db)):
-    records, total = crud_room_type.read(db)
+def get_room_types(
+    db: Session = Depends(get_db),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+):
+    records, total = crud_room_type.read(db,page=page, limit=limit)
     return ResponseModel(
         data=records, total=total, message="Room types retrieved successfully"
     )

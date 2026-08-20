@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -18,6 +18,19 @@ def create_room(
     room = crud_room.create_room(db,payload)
     
     return ResponseModel(data=room, message="room made successfully")
+
+
+@router.get("", response_model=ResponseModel[list[RoomOut]],dependencies=[Depends(require_permission("room.view_all"))])
+def get_all_rooms(
+    db: Session = Depends(get_db),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+):
+    rooms, total = crud_room.read(db, page=page, limit=limit)
+    
+    return ResponseModel(data=rooms, message="All rooms retrieved", total=total)
+
+
 
 
 @router.put("/{uid}", response_model=ResponseModel[RoomUpdate], dependencies=[Depends(require_permission("room.update"))])
@@ -44,14 +57,5 @@ def get_one_room(
         )
         
     return ResponseModel(data=RoomOut, message="Room retrieved Successfully" )
-
-
-@router.get("", response_model=ResponseModel[list[RoomOut]],dependencies=[Depends(require_permission("room.view_all"))])
-def get_all_rooms(
-    db: Session = Depends(get_db),
-):
-    rooms, total = crud_room.read(db)
-    
-    return ResponseModel(data=rooms, message="All rooms retrieved")
 
 

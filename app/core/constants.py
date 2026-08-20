@@ -43,441 +43,196 @@ DEFAULT_ROLES = [
 
 DEFAULT_PERMISSIONS = [
     # ========================================================
-    # USERS
-    # ========================================================
-    {
-        "id": 1,
-        "name": "users.view_all",
-        "description": "View all users",
-        "category": "users",
-    },
-    {
-        "id": 2,
-        "name": "users.create",
-        "description": "Create new users",
-        "category": "users",
-    },
-    {
-        "id": 3,
-        "name": "users.edit",
-        "description": "Edit user details",
-        "category": "users",
-    },
-    {
-        "id": 4,
-        "name": "users.delete",
-        "description": "Delete users",
-        "category": "users",
-    },
-    {
-        "id": 5,
-        "name": "users.view_own",
-        "description": "View own profile",
-        "category": "users",
-    },
-    {
-        "id": 6,
-        "name": "users.edit_own",
-        "description": "Edit own profile",
-        "category": "users",
-    },
-    # ========================================================
-    # ROLES & PERMISSIONS
-    # ========================================================
-    {"id": 7, "name": "roles.view", "description": "View roles", "category": "roles"},
-    {
-        "id": 8,
-        "name": "roles.create",
-        "description": "Create roles",
-        "category": "roles",
-    },
-    {"id": 9, "name": "roles.edit", "description": "Edit roles", "category": "roles"},
-    {
-        "id": 10,
-        "name": "roles.delete",
-        "description": "Delete roles",
-        "category": "roles",
-    },
-    {
-        "id": 11,
-        "name": "permissions.manage",
-        "description": "Manage permissions",
-        "category": "roles",
-    },
-    # ========================================================
     # GUESTS
     # ========================================================
     {
-        "id": 12,
-        "name": "guests.view_all",
-        "description": "View all guests",
-        "category": "guests",
-    },
-    {
-        "id": 13,
-        "name": "guests.create",
+        "id": 1,
+        "name": "guest.create",
         "description": "Create guest profiles",
         "category": "guests",
     },
     {
-        "id": 14,
-        "name": "guests.edit",
+        "id": 2,
+        "name": "guest.edit",
         "description": "Edit guest details",
         "category": "guests",
     },
     {
-        "id": 15,
-        "name": "guests.delete",
-        "description": "Delete guest profiles",
+        "id": 3,
+        "name": "guest.view_all",
+        "description": "View all guests",
         "category": "guests",
+    },
+    {
+        "id": 4,
+        "name": "guest_view",
+        "description": "View a single guest profile",
+        "category": "guests",
+    },
+    # ========================================================
+    # MANAGERS
+    # ========================================================
+    {
+        "id": 5,
+        "name": "manager.create",
+        "description": "Create manager accounts",
+        "category": "managers",
+    },
+    {
+        "id": 6,
+        "name": "manager.update",
+        "description": "Edit manager details",
+        "category": "managers",
+    },
+    {
+        "id": 7,
+        "name": "manager.view_all",
+        "description": "View all managers",
+        "category": "managers",
+    },
+    {
+        "id": 8,
+        "name": "manager.view_one",
+        "description": "View a single manager",
+        "category": "managers",
+    },
+    # ========================================================
+    # ROLES & PERMISSIONS
+    # ========================================================
+    {
+        "id": 9,
+        "name": "permissions.edit",
+        "description": "Edit individual permissions",
+        "category": "roles",
+    },
+    {
+        "id": 10,
+        "name": "permissions.manage",
+        "description": "Manage role-permission assignments",
+        "category": "roles",
+    },
+    {
+        "id": 11,
+        "name": "roles.create",
+        "description": "Create roles",
+        "category": "roles",
+    },
+    {
+        "id": 12,
+        "name": "roles.edit",
+        "description": "Edit roles",
+        "category": "roles",
+    },
+    {
+        "id": 13,
+        "name": "roles.view",
+        "description": "View roles",
+        "category": "roles",
+    },
+    # ========================================================
+    # RESERVATIONS
+    # ========================================================
+    {
+        "id": 14,
+        "name": "reservations.cancel",
+        "description": "Cancel reservations",
+        "category": "reservations",
+    },
+    {
+        "id": 15,
+        "name": "reservations.check_in",
+        "description": "Check guests in",
+        "category": "reservations",
     },
     {
         "id": 16,
-        "name": "guests.view_own",
-        "description": "View own guest profile",
-        "category": "guests",
+        "name": "reservations.check_out",
+        "description": "Check guests out",
+        "category": "reservations",
     },
     {
         "id": 17,
-        "name": "guests.edit_own",
-        "description": "Edit own guest profile",
-        "category": "guests",
+        "name": "reservations.confirm",
+        "description": "Confirm reservations",
+        "category": "reservations",
     },
-    # ========================================================
-    # ROOM TYPES
-    # ========================================================
     {
         "id": 18,
-        "name": "room_types.view",
-        "description": "View room types",
-        "category": "room_types",
+        "name": "reservations.create",
+        "description": "Create reservations",
+        "category": "reservations",
     },
     {
         "id": 19,
-        "name": "room_types.create",
-        "description": "Create room types",
-        "category": "room_types",
+        "name": "reservations.edit",
+        "description": "Edit reservation details",
+        "category": "reservations",
     },
     {
         "id": 20,
-        "name": "room_types.edit",
-        "description": "Edit room types",
-        "category": "room_types",
+        "name": "reservations.view_all",
+        "description": "View all reservations",
+        "category": "reservations",
     },
     {
         "id": 21,
-        "name": "room_types.delete",
-        "description": "Delete room types",
-        "category": "room_types",
+        "name": "reservations.view_own",
+        "description": "View own reservations",
+        "category": "reservations",
     },
     # ========================================================
     # ROOMS
     # ========================================================
     {
         "id": 22,
-        "name": "rooms.view_all",
-        "description": "View all rooms",
-        "category": "rooms",
-    },
-    {
-        "id": 23,
-        "name": "rooms.view_available",
-        "description": "View available rooms",
-        "category": "rooms",
-    },
-    {
-        "id": 24,
-        "name": "rooms.create",
+        "name": "room.create",
         "description": "Create rooms",
         "category": "rooms",
     },
     {
-        "id": 25,
-        "name": "rooms.edit",
+        "id": 23,
+        "name": "room.update",
         "description": "Edit room details",
         "category": "rooms",
     },
     {
-        "id": 26,
-        "name": "rooms.delete",
-        "description": "Delete rooms",
+        "id": 24,
+        "name": "room.view_all",
+        "description": "View all rooms",
         "category": "rooms",
+    },
+    {
+        "id": 25,
+        "name": "room.view_one",
+        "description": "View a single room",
+        "category": "rooms",
+    },
+    # ========================================================
+    # USERS
+    # ========================================================
+    {
+        "id": 26,
+        "name": "user.create",
+        "description": "Create new users",
+        "category": "users",
     },
     {
         "id": 27,
-        "name": "rooms.update_status",
-        "description": "Update room status",
-        "category": "rooms",
+        "name": "user.update",
+        "description": "Edit user details",
+        "category": "users",
     },
-    # ========================================================
-    # RESERVATIONS
-    # ========================================================
     {
         "id": 28,
-        "name": "reservations.view_all",
-        "description": "View all reservations",
-        "category": "reservations",
+        "name": "user.view_one",
+        "description": "View a single user",
+        "category": "users",
     },
     {
         "id": 29,
-        "name": "reservations.view_own",
-        "description": "View own reservations",
-        "category": "reservations",
-    },
-    {
-        "id": 30,
-        "name": "reservations.create",
-        "description": "Create reservations",
-        "category": "reservations",
-    },
-    {
-        "id": 31,
-        "name": "reservations.edit",
-        "description": "Edit reservation details",
-        "category": "reservations",
-    },
-    {
-        "id": 32,
-        "name": "reservations.cancel",
-        "description": "Cancel reservations",
-        "category": "reservations",
-    },
-    {
-        "id": 33,
-        "name": "reservations.confirm",
-        "description": "Confirm reservations",
-        "category": "reservations",
-    },
-    {
-        "id": 34,
-        "name": "reservations.check_in",
-        "description": "Check guests in",
-        "category": "reservations",
-    },
-    {
-        "id": 35,
-        "name": "reservations.check_out",
-        "description": "Check guests out",
-        "category": "reservations",
-    },
-    {
-        "id": 36,
-        "name": "reservations.view_history",
-        "description": "View reservation history",
-        "category": "reservations",
-    },
-    # ========================================================
-    # DEPOSITS
-    # ========================================================
-    {
-        "id": 37,
-        "name": "deposits.view_all",
-        "description": "View all deposits",
-        "category": "deposits",
-    },
-    {
-        "id": 38,
-        "name": "deposits.view_own",
-        "description": "View own deposits",
-        "category": "deposits",
-    },
-    {
-        "id": 39,
-        "name": "deposits.create",
-        "description": "Create deposit records",
-        "category": "deposits",
-    },
-    {
-        "id": 40,
-        "name": "deposits.confirm",
-        "description": "Confirm deposit payments",
-        "category": "deposits",
-    },
-    {
-        "id": 41,
-        "name": "deposits.refund",
-        "description": "Refund deposits",
-        "category": "deposits",
-    },
-    # ========================================================
-    # PAYMENTS
-    # ========================================================
-    {
-        "id": 42,
-        "name": "payments.view_all",
-        "description": "View all payments",
-        "category": "payments",
-    },
-    {
-        "id": 43,
-        "name": "payments.view_own",
-        "description": "View own payments",
-        "category": "payments",
-    },
-    {
-        "id": 44,
-        "name": "payments.process",
-        "description": "Process payments",
-        "category": "payments",
-    },
-    {
-        "id": 45,
-        "name": "payments.verify",
-        "description": "Verify payment transactions",
-        "category": "payments",
-    },
-    {
-        "id": 46,
-        "name": "payments.refund",
-        "description": "Process payment refunds",
-        "category": "payments",
-    },
-    {
-        "id": 47,
-        "name": "payments.view_details",
-        "description": "View payment details",
-        "category": "payments",
-    },
-    # ========================================================
-    # MANAGERS
-    # ========================================================
-    {
-        "id": 48,
-        "name": "managers.view_all",
-        "description": "View all managers",
-        "category": "managers",
-    },
-    {
-        "id": 49,
-        "name": "managers.create",
-        "description": "Create manager accounts",
-        "category": "managers",
-    },
-    {
-        "id": 50,
-        "name": "managers.edit",
-        "description": "Edit manager details",
-        "category": "managers",
-    },
-    {
-        "id": 51,
-        "name": "managers.delete",
-        "description": "Delete managers",
-        "category": "managers",
-    },
-    # ========================================================
-    # STAFF
-    # ========================================================
-    {
-        "id": 52,
-        "name": "staff.view_all",
-        "description": "View all staff",
-        "category": "staff",
-    },
-    {
-        "id": 53,
-        "name": "staff.create",
-        "description": "Create staff accounts",
-        "category": "staff",
-    },
-    {
-        "id": 54,
-        "name": "staff.edit",
-        "description": "Edit staff details",
-        "category": "staff",
-    },
-    {
-        "id": 55,
-        "name": "staff.delete",
-        "description": "Delete staff",
-        "category": "staff",
-    },
-    # ========================================================
-    # DASHBOARD
-    # ========================================================
-    {
-        "id": 56,
-        "name": "dashboard.admin",
-        "description": "Access administrator dashboard",
-        "category": "dashboard",
-    },
-    {
-        "id": 57,
-        "name": "dashboard.manager",
-        "description": "Access manager dashboard",
-        "category": "dashboard",
-    },
-    {
-        "id": 58,
-        "name": "dashboard.staff",
-        "description": "Access staff dashboard",
-        "category": "dashboard",
-    },
-    {
-        "id": 59,
-        "name": "dashboard.guest",
-        "description": "Access guest dashboard",
-        "category": "dashboard",
-    },
-    # ========================================================
-    # REPORTS & ANALYTICS
-    # ========================================================
-    {
-        "id": 60,
-        "name": "analytics.view",
-        "description": "View analytics dashboard",
-        "category": "analytics",
-    },
-    {
-        "id": 61,
-        "name": "analytics.export",
-        "description": "Export analytics data",
-        "category": "analytics",
-    },
-    {
-        "id": 62,
-        "name": "reports.reservations",
-        "description": "View reservation reports",
-        "category": "analytics",
-    },
-    {
-        "id": 63,
-        "name": "reports.payments",
-        "description": "View payment reports",
-        "category": "analytics",
-    },
-    {
-        "id": 64,
-        "name": "reports.guests",
-        "description": "View guest reports",
-        "category": "analytics",
-    },
-    {
-        "id": 65,
-        "name": "reports.occupancy",
-        "description": "View room occupancy reports",
-        "category": "analytics",
-    },
-    {
-        "id": 66,
-        "name": "reports.revenue",
-        "description": "View revenue reports",
-        "category": "analytics",
-    },
-    # ========================================================
-    # PROFILE
-    # ========================================================
-    {
-        "id": 67,
-        "name": "profile.view",
-        "description": "View own profile",
-        "category": "profile",
-    },
-    {
-        "id": 68,
-        "name": "profile.edit",
-        "description": "Edit own profile",
-        "category": "profile",
+        "name": "users.view_all",
+        "description": "View all users",
+        "category": "users",
     },
 ]
 
@@ -503,88 +258,65 @@ DEFAULT_ROLE_PERMISSIONS = {
     # MANAGER
     # --------------------------------------------------------
     ROLE_MANAGER_ID: [
-        # Users
-        1,
-        2,
-        3,
-        4,
         # Guests
-        5,
-        6,
-        7,
-        8,
-        # Rooms
-        9,
-        10,
-        11,
-        12,
-        # Room Types
-        13,
-        14,
-        15,
-        16,
-        # Reservations
-        17,
-        18,
-        19,
-        20,
-        # Payments
-        21,
-        22,
-        23,
+        1,  # guest.create
+        2,  # guest.edit
+        3,  # guest.view_all
+        4,  # guest_view
         # Managers
-        24,
-        25,
-        26,
-        27,
-        # Staff
-        28,
-        29,
-        30,
-        31,
+        7,  # manager.view_all
+        8,  # manager.view_one
+        # Reservations
+        14,  # reservations.cancel
+        15,  # reservations.check_in
+        16,  # reservations.check_out
+        17,  # reservations.confirm
+        18,  # reservations.create
+        19,  # reservations.edit
+        20,  # reservations.view_all
+        21,  # reservations.view_own
+        # Rooms
+        22,  # room.create
+        23,  # room.update
+        24,  # room.view_all
+        25,  # room.view_one
+        # Users
+        28,  # user.view_one
+        29,  # users.view_all
     ],
     # --------------------------------------------------------
     # STAFF
     # --------------------------------------------------------
     ROLE_STAFF_ID: [
         # Guests
-        5,
-        6,
-        7,
-        # Rooms
-        10,
-        # Room Types
-        14,
+        3,  # guest.view_all
+        4,  # guest_view
         # Reservations
-        17,
-        18,
-        19,
-        20,
-        # Payments
-        21,
-        22,
-        # Staff
-        29,
+        14,  # reservations.cancel
+        15,  # reservations.check_in
+        16,  # reservations.check_out
+        17,  # reservations.confirm
+        18,  # reservations.create
+        19,  # reservations.edit
+        20,  # reservations.view_all
+        21,  # reservations.view_own
+        # Rooms
+        24,  # room.view_all
+        25,  # room.view_one
     ],
     # --------------------------------------------------------
     # GUEST
     # --------------------------------------------------------
     ROLE_GUEST_ID: [
-        # Own/basic guest functionality
-        6,
-        7,
-        # View rooms
-        10,
-        # View room types
-        14,
+        # Own guest profile
+        2,  # guest.edit
+        4,  # guest_view
         # Reservations
-        17,
-        18,
-        19,
-        20,
-        # Payments
-        21,
-        22,
+        14,  # reservations.cancel
+        18,  # reservations.create
+        21,  # reservations.view_own
+        # Rooms
+        24,  # room.view_all
     ],
 }
 
@@ -844,7 +576,7 @@ DEFAULT_ROOMS = [
         "id": 1,
         "room_number": 101,
         "room_type_id": 1,
-        "availability": True,
+        "room_availability": True,
         "status": "available",
         "image": "standard-101.jpg",
         "amenities": None,
@@ -853,7 +585,7 @@ DEFAULT_ROOMS = [
         "id": 2,
         "room_number": 102,
         "room_type_id": 1,
-        "availability": True,
+        "room_availability": True,
         "status": "available",
         "image": "standard-102.jpg",
         "amenities": None,
@@ -862,7 +594,7 @@ DEFAULT_ROOMS = [
         "id": 3,
         "room_number": 201,
         "room_type_id": 2,
-        "availability": True,
+        "room_availability": True,
         "status": "available",
         "image": "deluxe-201.jpg",
         "amenities": None,
@@ -871,7 +603,7 @@ DEFAULT_ROOMS = [
         "id": 4,
         "room_number": 202,
         "room_type_id": 2,
-        "availability": True,
+        "room_availability": True,
         "status": "available",
         "image": "deluxe-202.jpg",
         "amenities": None,
@@ -880,7 +612,7 @@ DEFAULT_ROOMS = [
         "id": 5,
         "room_number": 301,
         "room_type_id": 3,
-        "availability": True,
+        "room_availability": True,
         "status": "available",
         "image": "superior-301.jpg",
         "amenities": None,
@@ -889,7 +621,7 @@ DEFAULT_ROOMS = [
         "id": 6,
         "room_number": 302,
         "room_type_id": 3,
-        "availability": True,
+        "room_availability": True,
         "status": "available",
         "image": "superior-302.jpg",
         "amenities": None,
@@ -898,7 +630,7 @@ DEFAULT_ROOMS = [
         "id": 7,
         "room_number": 401,
         "room_type_id": 4,
-        "availability": True,
+        "room_availability": True,
         "status": "available",
         "image": "executive-401.jpg",
         "amenities": None,
@@ -907,7 +639,7 @@ DEFAULT_ROOMS = [
         "id": 8,
         "room_number": 402,
         "room_type_id": 4,
-        "availability": True,
+        "room_availability": True,
         "status": "available",
         "image": "executive-402.jpg",
         "amenities": None,

@@ -1,20 +1,23 @@
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
+
 from fastapi import HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+
 from app.crud.base import CRUDBase
 from app.models.reservations import Reservations
 from app.models.guests import Guests
 from app.models.rooms import Rooms
 from app.models.room_types import RoomTypes
+from app.models.payments import Payment
 from app.schemas.reservation import ReservationCreate, ReservationUpdate
-from app.schemas.constants import RESERVATION_STATUSES
+
 MODEL = Reservations
 
 # statuses that "hold" a room, i.e. count toward an overlap conflict
-# ACTIVE_STATUSES = ("pending", "confirmed", "checked_in")
+ACTIVE_STATUSES = ("pending", "confirmed", "checked_in")
 
 
 class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
@@ -38,7 +41,7 @@ class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
         """True if room_id is free for [check_in, check_out)."""
         query = db.query(Reservations).filter(
             Reservations.room_id == room_id,
-            Reservations.status.in_(RESERVATION_STATUSES),
+            Reservations.status.in_(ACTIVE_STATUSES),
             Reservations.check_in_date < check_out,
             Reservations.check_out_date > check_in,
         )
@@ -50,7 +53,12 @@ class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
     # ------------------------------------------------------------
     # create
     # ------------------------------------------------------------
-    def create_reservation(self, db: Session, record_create: ReservationCreate) -> Reservations:
+    def create_reservation(
+        self,
+        db: Session,
+        record_create: ReservationCreate,
+        payment_method: str,
+    ) -> Reservations:
         # Step 1 — guest exists
         guest = db.query(Guests).filter(Guests.id == record_create.guest_id).first()
         if not guest:
@@ -93,8 +101,20 @@ class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
 
         try:
             db.add(db_obj)
+            db.flush()  # assigns db_obj.id without committing yet
+
+            payment = Payment(
+                reservation_id=db_obj.id,
+                amount=deposit_amount,
+                payment_type="deposit",
+                payment_method=payment_method,
+                payment_status="pending",
+            )
+            db.add(payment)
+
             db.commit()
             db.refresh(db_obj)
+            db.refresh(payment)
         except SQLAlchemyError:
             db.rollback()
             raise HTTPException(500, "Failed to create reservation")

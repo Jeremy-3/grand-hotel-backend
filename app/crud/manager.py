@@ -69,7 +69,7 @@ class CRUDManager(CRUDBase[MODEL,ManagerCreate]):
         
         return manager
     
-    def activate_guest(self,db:Session, uid:UUID):
+    def activate_manager(self,db:Session, uid:UUID):
         manager = self.get_record_by_field(db, "uid", uid)
         if not manager:
             raise HTTPException(
@@ -78,7 +78,7 @@ class CRUDManager(CRUDBase[MODEL,ManagerCreate]):
             )
         
         manager.status = "active"
-        db.commit 
+        db.commit()
         
         return manager
     

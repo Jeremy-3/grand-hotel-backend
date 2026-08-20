@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import HTTPException, Depends, status, APIRouter
+from fastapi import HTTPException, Depends, status, APIRouter, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -18,6 +18,17 @@ def create_manager(
     manager = crud_manager.create_manager(db, payload)
     
     return ResponseModel(data = manager, message="Manager Created Successfully")
+
+@router.get("",response_model=ResponseModel[list[ManagerOut]], dependencies=[Depends(require_permission("manager.view_all"))])
+def get_all(
+    db: Session = Depends(get_db),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+):
+    manager, total = crud_manager.read(db,page=page, limit=limit)
+    
+    return ResponseModel(data=manager, message="Managers Retrieved successfully", total=total)
+
 
 @router.put("/{uid}", response_model=ResponseModel[ManagerUpdate], dependencies=[Depends(require_permission("manager.update"))])
 def update_manager(
@@ -41,13 +52,7 @@ def get_one(
     return ResponseModel(data=manager, message="Manager retrieved successfully")
 
 
-@router.get("",response_model=ResponseModel[list[ManagerOut]], dependencies=[Depends(require_permission("manager.view_all"))])
-def get_all(
-    db: Session = Depends(get_db)
-):
-    manager = crud_manager.read(db)
-    
-    return ResponseModel(data=manager, message="Managers Retrieved successfully")
+
 
 
     

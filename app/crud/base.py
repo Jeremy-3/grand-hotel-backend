@@ -96,8 +96,8 @@ class CRUDBase(Generic[ModelType,SchemaType]):
     def read(
         self,
         db: Session,
-        page: int = Query(1, ge=1),
-        limit: int = Query(10, ge=100),
+        page: int = 1,
+        limit: int = 10,
         relationships: Optional[List[str]] = None,
         filters: Optional[List[Dict[str, Any]]] = None,
         order_by: Optional[Any] = None

@@ -22,7 +22,7 @@ class CRUDRoomType(CRUDBase[MODEL, RoomTypeCreate]):
         return self.create(db, record_create)
 
     def update_room_type(self, db: Session, uid: UUID, record_in: RoomTypeUpdate):
-        record = self.get_record_by_field(db, "uid", record_in.uid)
+        record = self.get_record_by_field(db, "uid", uid)
         if not record:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Room type not found"

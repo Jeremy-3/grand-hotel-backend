@@ -29,8 +29,10 @@ def create_permission(
 )
 def get_all_permissions(
     db: Session = Depends(get_db),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
 ):
-    permissions, total = crud_permission.read(db)
+    permissions, total = crud_permission.read(db,page=page, limit=limit)
 
     return ResponseModel(
         data=permissions, total=total, message="Permissions retrieved successfully"
