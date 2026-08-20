@@ -1,141 +1,248 @@
-# 🏨 Hotel Management System Backend
-Welcome to the Hotel Management System backend! This project is designed to be the central management system for a hotel, allowing you to efficiently handle rooms, bookings, guests, and staff. The backend is built using Flask, a lightweight and powerful web framework, with SQLAlchemy for database management and JWT-based authentication for secure access.
+# Grand Hotel Backend
 
-## 🚀 Project Overview
-Our hotel management system helps hotels streamline their operations by automating key functions such as:
+FastAPI backend for the Grand Hotel reservation and hotel-operations platform. It provides authentication, JWT-based role permissions, room and room-type management, guest and manager management, reservations, payment records, and reservation lifecycle actions.
 
-- Room management (availability, pricing, room types)
-- Booking management (check-in, check-out, guest details)
-- Guest management (personal information, booking history)
-- Staff management (roles, login, and authentication)
-- User authentication with JWT tokens for secure login and session handling
-- Custom error handling for smooth user experience
+The backend runs with PostgreSQL and is consumed by the React frontend in the sibling `Grand-Hotel` project.
 
-## 🎯 Features
-Here’s a quick breakdown of the features our system provides:
+## What It Provides
 
-1. **Room Management**
-Add, update, delete, or retrieve hotel rooms.
-Manage room types (Single, Double, Suite, etc.).
-Keep track of room availability and pricing.
-2. **Guest Management**
-Store and manage guest information (name, email, phone).
-Retrieve guest booking history and current stays.
-Add new guests when they check in.
-3. **Booking Management**
-Create and manage hotel bookings.
-Track check-in and check-out dates for guests.
-Associate each booking with a specific room and guest.
-4. **Staff Management**
-Staff can log in and access different system features based on their role.
-5. **JWT Authentication**
-Secure authentication using JSON Web Tokens (JWT).
-Staff members can sign up and log in.
-Sessions are protected, and token-based authentication ensures secure access.
-## 🛠️ Technologies Used
-The backend is built using modern technologies to ensure performance, scalability, and maintainability:
+- JWT login, signup, and logout endpoints
+- Role-based access control for Superadmin, Manager, Staff, and Guest users
+- Room and room-type inventory
+- Guest and manager profiles
+- Reservation creation, availability checks, cancellation, check-in, and check-out
+- Deposit and full-payment records
+- Five-day expiry for pending reservations when payment is skipped
+- Automatic reservation confirmation after payment confirmation
+- PostgreSQL migrations through Alembic
+- Development seed data for roles, permissions, users, rooms, reservations, and payments
 
-- **Flask:** A lightweight and flexible web framework for building robust applications.
-**SQLAlchemy:** A powerful ORM (Object-Relational Mapping) library for interacting with the database.
-**Flask-Migrate:** For managing database migrations and schema changes.
-**JWT (JSON Web Tokens):** Secure and scalable authentication method.
-**SQLite:** A simple and lightweight database for storing data.
-## 🔥 Getting Started
-To get the backend up and running on your local machine, follow these steps:
+## Technology
 
-1. **Clone the Repository**
-```bash
-git clone https://github.com/Jeremy-3/group-propject-backend.git
+- Python 3.12+
+- FastAPI 0.110
+- SQLAlchemy 2
+- PostgreSQL
+- Alembic
+- Pydantic v2
+- JWT with `python-jose`
+- bcrypt password hashing
+- Uvicorn
+
+## Project Layout
+
+```text
+grand-hotel-backend/
+├── main.py                 # FastAPI application entry point
+├── app/
+│   ├── core/               # Settings, constants, security
+│   ├── crud/               # Database operations and business rules
+│   ├── dependencies/       # Authentication and RBAC dependencies
+│   ├── models/             # SQLAlchemy models
+│   ├── routes/             # API endpoints
+│   ├── schemas/            # Request and response schemas
+│   └── commands/           # Development commands such as the seeder
+├── alembic/                # Database migration scripts
+├── alembic.ini
+├── requirements.txt
+└── .env                    # Local secrets; do not commit
 ```
-2. **Set Up Your Environment**
-It’s recommended to use a virtual environment for your project dependencies:
+
+## Prerequisites
+
+- Python 3.12 or newer
+- PostgreSQL 14 or newer
+- Git
+- A PostgreSQL database, for example `hoteldb`
+
+The frontend expects this API at `http://localhost:8000` during local development.
+
+## Installation
 
 ```bash
-pipenv install && pipenv shell
-```
-3. **Install Dependencies**
-Install all the required Python packages listed in the requirements.txt file:
-
-```bash
+cd grand-hotel-backend
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
-4. **Database Setup**
-Before running the application, set up the database:
 
-- *Initialize the database:*
+On Windows PowerShell:
 
-```bash
-flask db init
-flask db migrate -m "Initial migration."
-flask db upgrade
-```
-- *Seed the database:*
-```bash
-python seed.py
+```powershell
+venv\Scripts\Activate.ps1
 ```
 
-5. **Running the Application**
-Now can run the server:
+## Environment Configuration
+
+Create `grand-hotel-backend/.env`. Use local values and never commit real credentials.
+
+```dotenv
+APP_ENV=local
+DEBUG=false
+DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/hoteldb"
+
+ACCESS_TOKEN_EXPIRE_SECONDS=14400
+JWT_SECRET_KEY="replace-with-a-long-random-secret"
+JWT_ALGORITHM="HS256"
+
+SUPERADMIN_NAME="Superadmin"
+SUPERADMIN_EMAIL="superadmin@example.com"
+SUPERADMIN_PHONE="0700000000"
+SUPERADMIN_PASSWORD="replace-with-a-development-password"
+
+MPESA_ENV=sandbox
+MPESA_CONSUMER_KEY=""
+MPESA_CONSUMER_SECRET=""
+MPESA_SHORTCODE="174379"
+MPESA_PASSKEY=""
+MPESA_CALLBACK_URL=""
+
+FLW_ENV=test
+FLW_PUBLIC_KEY=""
+FLW_SECRET_KEY=""
+FLW_ENCRYPTION_KEY=""
+FLW_CALLBACK_URL=""
+FLW_REDIRECT_URL=""
+```
+
+`DATABASE_URL` must point to an existing PostgreSQL database. The application does not create the PostgreSQL server or database itself.
+
+## Database Setup
+
+Run migrations from the backend directory with the virtual environment active:
 
 ```bash
-python app.py
+alembic upgrade head
 ```
-The application will run on http://localhost:5000. 🎉
 
-## 📖 API Documentation
-This project follows the RESTful API design, with different endpoints for each feature. Here’s a quick guide to the available API routes:
+After changing SQLAlchemy models, create and apply a migration:
 
-## 🏨 Rooms
-GET /api/rooms - Retrieve all rooms.
-POST /api/rooms - Add a new room.
-PUT /api/rooms/
-- Update room details.
-DELETE /api/rooms/
-- Delete a room.
-## 👤 Guests
-GET /api/guests - Retrieve all guests.
-POST /api/guests - Add a new guest.
-## 🛏️ Bookings
-GET /api/bookings - Retrieve all bookings.
-POST /api/bookings - Create a new booking.
+```bash
+alembic revision --autogenerate -m "describe the change"
+alembic upgrade head
+```
 
-## 📝 Contributing
-We welcome contributions to make this project even better! To get started:
+Review autogenerated migrations before applying them, especially changes involving payment and reservation data.
 
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix (`git checkout -b feature-name`).
-3. Commit your changes (git commit -am 'Add new feature').
-4. Push to your branch (git push origin feature-name).
-5. Create a Pull Request and describe the changes in detail.
+## Seed Development Data
 
-## 🛠️ Deployment
-This project can be deployed using platforms like Heroku, Vercel, or AWS. Ensure that the database is set up appropriately and the necessary environment variables (like SECRET_KEY and DATABASE_URI) are configured.
+The seeder creates default roles, permissions, demo users, guest and manager profiles, room types, rooms, reservations, and payment records.
 
-## 🎉 Future Enhancements
-Here are some exciting features that could be added in future iterations of this project:
+```bash
+python -m app.commands.seed_all
+```
 
-- Payment integration for guests during booking.
-- Advanced reporting to track room occupancy and guest statistics.
--  Role-based access control to limit what certain staff members can do.
-- Email notifications to inform guests about their bookings or changes.
-- Automated room cleaning management for housekeeping staff.
-## 🙏 Acknowledgments
-Flask for being an awesome Python framework.
-SQLAlchemy for making database interactions smooth.
-Flask-Migrate for managing database migrations with ease.
-The open-source community for the amazing resources and libraries used in this project.
-## 📜 License
-This project is licensed under the MIT License. Feel free to use and modify it as you see fit!
+The seeder is safe to rerun for existing seed IDs and repairs PostgreSQL primary-key sequences after explicit seed IDs are inserted. Development Superadmin credentials come from `.env`; demo accounts are defined in `app/core/constants.py`.
 
-## 🧐 Questions?
-Feel free to open an issue if you find a bug or have a feature request. We’re also happy to receive feedback to improve the system!
+## Run the API
 
-Let’s build an amazing hotel management system together! 🏨✨
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 
-## ✍️ Authors
+- Root health response: `http://localhost:8000/`
+- Swagger UI: `http://localhost:8000/docs`
+- API prefix: `http://localhost:8000/api`
 
-1. Elvis Kimani
-2. Jeremy Gitau
-3. Tony Maina
-4. Keith Mwai
-5. Franklin Ndegwa
+The frontend Vite proxy forwards `/api` requests to port `8000`.
+
+## Authentication and Permissions
+
+1. Call `POST /api/auth/login` with email and password.
+2. Store the returned `access_token` on the client.
+3. Send it on protected requests:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+The token includes the user, role, expiry, and permission names. The backend still checks permissions against the database; frontend permission checks only control visibility and workflow choices.
+
+### Roles
+
+| Role         | Purpose                                                                       |
+| ------------ | ----------------------------------------------------------------------------- |
+| `SUPERADMIN` | Full hotel configuration, RBAC, people, rooms, reports, and operations access |
+| `MANAGER`    | Hotel operations, guests, reservations, rooms, and management tasks           |
+| `STAFF`      | Front-desk operations and reservation lifecycle tasks                         |
+| `GUEST`      | Own reservations, booking, room browsing, and own guest profile               |
+
+## Main API Areas
+
+All endpoints are under `/api`.
+
+| Area                  | Examples                                                                        |
+| --------------------- | ------------------------------------------------------------------------------- |
+| Auth                  | `POST /auth/login`, `POST /auth/signup`, `POST /auth/logout`                    |
+| Rooms                 | `GET /rooms`, `POST /rooms`, `PUT /rooms/{uid}`                                 |
+| Room types            | `GET /room-types`, `POST /room-types`, `PUT /room-types/{uid}`                  |
+| Guests                | `GET /guests`, `POST /guests/register`, `PUT /guests/{uid}`                     |
+| Managers              | `GET /managers`, `POST /managers`, `PUT /managers/{uid}`                        |
+| Reservations          | `GET /reservations`, `POST /reservations`, `GET /reservations/guest/{guest_id}` |
+| Reservation lifecycle | `POST /reservations/{uid}/confirm`, `/check-in`, `/check-out`, `/cancel`        |
+| Payments              | `POST /payments`, `POST /payments/{uid}/confirm`, `/fail`, `/refund`            |
+| RBAC                  | `/roles`, `/permissions`, `/role-permissions`                                   |
+
+## Reservation Rules
+
+- A room must be active and have `room_availability=available` before booking.
+- Overlapping pending, confirmed, or checked-in reservations block a room.
+- A pending reservation expires after five days when payment is skipped.
+- Deposit confirmation moves a pending reservation to `confirmed`.
+- Full payment can be recorded for the entire reservation amount.
+- Checkout is rejected until paid payments cover the reservation total.
+- Authorized operators can cancel a checked-in reservation according to the current business rules.
+
+## Troubleshooting
+
+### `Room is not available for booking`
+
+The room is occupied, reserved, under maintenance, inactive, or became unavailable after the list loaded. Refresh the frontend and choose another available room.
+
+### `Email already registered`
+
+Use the existing guest search. Walk-in guest registration reuses an existing guest profile when the email already belongs to one.
+
+### Duplicate primary-key errors
+
+Run the seeder after importing explicit-ID data. It repairs PostgreSQL sequences:
+
+```bash
+python -m app.commands.seed_all
+```
+
+### `401 Unauthorized`
+
+Log in again and send the new JWT in the `Authorization` header.
+
+### `403 Missing permission`
+
+Check the user role and role-permission assignments. Log out and log in again after permissions change so a fresh token is issued.
+
+### Database connection errors
+
+Confirm PostgreSQL is running, the database exists, and `DATABASE_URL` is correct. URL-encode special characters in database passwords.
+
+## Production Notes
+
+- Use a managed PostgreSQL database.
+- Set a strong random `JWT_SECRET_KEY`.
+- Rotate credentials that have been exposed or shared.
+- Restrict CORS origins in `main.py` instead of allowing `*`.
+- Use HTTPS for payment callbacks and API traffic.
+- Keep `.env`, database dumps, and payment secrets out of Git.
+- Run `alembic upgrade head` during deployment.
+- Never use demo seed passwords in production.
+
+## Development Checklist
+
+```bash
+source venv/bin/activate
+pip install -r requirements.txt
+alembic upgrade head
+python -m app.commands.seed_all
+uvicorn main:app --reload --port 8000
+```
+
+Then open the frontend at `http://localhost:5173`.
