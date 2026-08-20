@@ -1,10 +1,9 @@
 from pydantic import BaseModel
 from typing import Generic, TypeVar, Optional, Any
-from pydantic.generics import GenericModel
 
 T = TypeVar("T")
 
-class ResponseModel(GenericModel, Generic[T]):
+class ResponseModel(BaseModel, Generic[T]):
     success: bool = True
     data: Optional[T] = None
     message: Optional[str] = "Operation Successful"

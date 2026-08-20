@@ -12,10 +12,12 @@ class ReservationBase(BaseModel):
     room_id: int
     check_in_date: datetime
     check_out_date: datetime
+    payment_due_at: datetime
     status: Optional[str] = "pending"
     room_price_per_night: int
     deposit_percentage: int
     deposit_amount: int
+    total_amount: int
 
     @field_validator("status")
     def validate_reservation_status(cls, v: str) -> str:
@@ -24,7 +26,7 @@ class ReservationBase(BaseModel):
                 f"Invalid reservation status. Must be one of {RESERVATION_STATUSES}"
             )
         return v
-    
+
 
 class ReservationCreate(ReservationBase):
     pass
@@ -33,12 +35,14 @@ class ReservationCreate(ReservationBase):
 class ReservationUpdate(BaseModel):
     guest_id: Optional[int] = None
     room_id: Optional[int] = None
-    check_in_date: Optional[str] = None
-    check_out_date: Optional[str] = None
+    check_in_date: Optional[datetime] = None
+    check_out_date: Optional[datetime] = None
+    payment_due_at: Optional[datetime] = None
     status: Optional[str] = None
     room_price_per_night: Optional[int] = None
     deposit_percentage: Optional[int] = None
     deposit_amount: Optional[int] = None
+    total_amount: Optional[int] = None
 
     @field_validator("status")
     def validate_reservation_status(cls, v: str) -> str:
@@ -47,8 +51,8 @@ class ReservationUpdate(BaseModel):
                 f"Invalid reservation status. Must be one of {RESERVATION_STATUSES}"
             )
         return v
-    
-    
+
+
 class ReservationOut(ReservationBase):
     id: int
     uid: UUID
@@ -60,5 +64,3 @@ class ReservationOut(ReservationBase):
     model_config = {
         "from_attributes": True,
     }
-    
-    

@@ -23,7 +23,5 @@ class Users(Base):
     
     # relationships
     guest = relationship("Guests", back_populates="user")
-    role = relationship("Roles", back_populates="user")
-    manager = relationship("Managers", back_populates="users")
-    
-    
+    role = relationship("Roles", back_populates="users")
+    manager = relationship("Managers", back_populates="user")

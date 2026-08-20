@@ -35,6 +35,8 @@ class Reservations(Base):
     room_id = Column(
         Integer, ForeignKey("rooms.id", ondelete="RESTRICT"), nullable=False
     )
+    
+    payment_due_at = Column(DateTime(timezone=True), nullable=False)
 
     check_in_date = Column(DateTime(timezone=True), nullable=False)
 
@@ -48,6 +50,8 @@ class Reservations(Base):
     deposit_percentage = Column(Integer, nullable=False)
 
     deposit_amount = Column(Integer, nullable=False)
+    
+    total_amount = Column(Integer, nullable=False)
 
     created_at = Column(
         TIMESTAMP(timezone=True),

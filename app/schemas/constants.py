@@ -6,7 +6,7 @@ PAYMENT_TYPES = {
 
 
 PAYMENT_METHODS = {
-    "debit_card",
+    "card",
     "mpesa",
     "cash",
 }
@@ -28,6 +28,7 @@ ROOM_TYPES = {
 
 ROOM_STATUSES = {
     "available",
+    "reserved",
     "occupied",
     "under_maintenance",
 }
@@ -37,6 +38,7 @@ RESERVATION_STATUSES = {
     "confirmed",
     "checked_in",
     "checked_out",
+    "expired",
     "cancelled",
 }
 

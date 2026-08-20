@@ -2,14 +2,14 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.dependencies.auth import get_current_user
-from app.models.user import User
-from app.models.role_permission import RolePermission
+from app.models.users import Users
+from app.models.role_permissions import RolePermission
 from app.models.permissions import Permissions
 
 def require_permission(permission_name: str):
     def dependency(
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user),
+        current_user: Users = Depends(get_current_user),
     ):
         if current_user.role_id == 1:
             return True

@@ -1,4 +1,4 @@
-from fastapi import status, HTTPException
+from fastapi import status, HTTPException, Query
 from typing import Type, TypeVar, Generic, List, Any, Optional, Dict, Union
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_, func
@@ -96,8 +96,8 @@ class CRUDBase(Generic[ModelType,SchemaType]):
     def read(
         self,
         db: Session,
-        page: int = 1,
-        limit: int = 10,
+        page: int = Query(1, ge=1),
+        limit: int = Query(10, ge=100),
         relationships: Optional[List[str]] = None,
         filters: Optional[List[Dict[str, Any]]] = None,
         order_by: Optional[Any] = None

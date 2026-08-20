@@ -22,5 +22,3 @@ class Rooms(Base):
     # relationships
     reservations = relationship("Reservations", back_populates="room")
     room_type = relationship("RoomTypes", back_populates="rooms")
-    
-    users = rel

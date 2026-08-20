@@ -1,11 +1,11 @@
-from app.models.managers import Managers
+from app.models.manager import Managers
 from app.schemas.manager import ManagerCreate, ManagerUpdate
 from app.core.constants import ROLE_MANAGER_ID
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.crud.base import CRUDBase
 from uuid import UUID
-from app.models.users import User
+from app.models.users import Users
 
 
 MODEL = Managers
@@ -15,7 +15,7 @@ class CRUDManager(CRUDBase[MODEL,ManagerCreate]):
     
     def create_manager(self, db:Session, record_create:ManagerCreate):
         # ensure user exists first 
-        user = db.query(User).filter(User.id == record_create.user_id).first()
+        user = db.query(Users).filter(Users.id == record_create.user_id).first()
         if not user:
             raise HTTPException(404, "User not found")
         
