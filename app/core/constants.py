@@ -234,6 +234,24 @@ DEFAULT_PERMISSIONS = [
         "description": "View all users",
         "category": "users",
     },
+    {
+        "id": 30,
+        "name": "room_types.create",
+        "description": "Create room types",
+        "category": "room_types",
+    },
+    {
+        "id": 31,
+        "name": "room_types.view",
+        "description": "View room types",
+        "category": "room_types",
+    },
+    {
+        "id": 32,
+        "name": "room_types.edit",
+        "description": "Edit room types",
+        "category": "room_types",
+    },
 ]
 
 
@@ -280,6 +298,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         23,  # room.update
         24,  # room.view_all
         25,  # room.view_one
+        31,  # room_types.view
         # Users
         28,  # user.view_one
         29,  # users.view_all
@@ -303,6 +322,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         # Rooms
         24,  # room.view_all
         25,  # room.view_one
+        31,  # room_types.view
     ],
     # --------------------------------------------------------
     # GUEST
@@ -317,6 +337,7 @@ DEFAULT_ROLE_PERMISSIONS = {
         21,  # reservations.view_own
         # Rooms
         24,  # room.view_all
+        31,  # room_types.view
     ],
 }
 
@@ -417,9 +438,11 @@ DEFAULT_USERS = [
 DEFAULT_GUESTS = [
     {
         "user_id": 2,
+        "status": "active",
     },
     {
         "user_id": 3,
+        "status": "active",
     },
 ]
 
@@ -437,9 +460,11 @@ DEFAULT_GUESTS = [
 DEFAULT_MANAGERS = [
     {
         "user_id": 4,
+        "status": "active",
     },
     {
         "user_id": 5,
+        "status": "active",
     },
 ]
 

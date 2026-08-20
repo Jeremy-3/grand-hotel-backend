@@ -25,7 +25,7 @@ class CRUDUser(CRUDBase[MODEL, UserCreate]):
             )
     
         record_data = record_create.model_dump()
-        record_data['password_hash'] =hash_password(record_data['password'])
+        record_data['password_hash'] = hash_password(record_data['password'])
 
         record_data.pop("password")
 

@@ -1,8 +1,10 @@
-from pydantic import BaseModel,field_validator,EmailStr
-from typing import Optional,Union
+from datetime import datetime
+from pydantic import BaseModel, field_validator, EmailStr
+from typing import Optional, Union
 from uuid import UUID
-from app.utils.validate import validate_kenyan_phone_number,validate_password
+from app.utils.validate import validate_kenyan_phone_number, validate_password
 from app.schemas.role import RoleOut
+
 
 class UserBase(BaseModel):
     name: str
@@ -14,20 +16,22 @@ class UserBase(BaseModel):
 class UserCreateDB(BaseModel):
     name: str
     email: EmailStr
+    phone_number: Optional[str] = None
     password_hash: str
     role_id: int | None = None
-    
+
+
 class UserCreate(BaseModel):
-    name:str
-    email:EmailStr
-    phone_number:Optional[str] = None
-    password:str
-    role_id:int | None = None
+    name: str
+    email: EmailStr
+    phone_number: Optional[str] = None
+    password: str
+    role_id: int | None = None
 
     @field_validator("password")
-    def validate_password_filed(cls,v:str) -> str:
-        return validate_password(v)  
-    
+    def validate_password_filed(cls, v: str) -> str:
+        return validate_password(v)
+
     @field_validator("phone_number")
     def validate_phone_number(cls, v: str) -> str:
         if v is not None:
@@ -36,32 +40,32 @@ class UserCreate(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    name : Optional[str] = None
-    email : Optional[EmailStr] = None
-    phone_number : Optional[str] = None
-    password : Optional[str] = None
-    role_id : Optional[int] = None
-    
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone_number: Optional[str] = None
+    password: Optional[str] = None
+    role_id: Optional[int] = None
+
     @field_validator("password")
-    def validate_password_filed(cls,v:str) -> str:
+    def validate_password_filed(cls, v: str) -> str:
         if v is not None:
             return validate_password(v)
         return v
-    
+
     @field_validator("phone_number")
     def validate_phone_number(cls, v: str) -> str:
         if v is not None:
             return validate_kenyan_phone_number(v)
         return v
-    
-    
+
+
 class UserOut(UserBase):
     id: int
     uid: UUID
     role: RoleOut = None
     is_active: bool
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     model_config = {
         "from_attributes": True,

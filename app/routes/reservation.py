@@ -12,6 +12,28 @@ router = APIRouter(prefix="/reservations", tags=["Reservations"])
 
 
 # ------------------------------------------------------------
+# READ - all reservations (staff/management)
+# ------------------------------------------------------------
+@router.get(
+    "",
+    response_model=ResponseModel[list[ReservationOut]],
+    dependencies=[Depends(require_permission("reservations.view_all"))],
+)
+def get_reservations(
+    db: Session = Depends(get_db),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+):
+    records, total = crud_reservation.read(
+        db,
+        page=page,
+        limit=limit,
+        relationships=["room", "guest"],
+    )
+    return ResponseModel(data=records, total=total)
+
+
+# ------------------------------------------------------------
 # CREATE
 # ------------------------------------------------------------
 @router.post(
@@ -26,22 +48,6 @@ def create_reservation(
 ):
     reservation = crud_reservation.create_reservation(db, payload, payment_method)
     return ResponseModel(data=reservation, message="Reservation created successfully")
-
-
-# ------------------------------------------------------------
-# READ - single
-# ------------------------------------------------------------
-@router.get(
-    "/{uid}",
-    response_model=ResponseModel[ReservationOut],
-    dependencies=[Depends(require_permission("reservations.view_all"))],
-)
-def get_reservation(
-    uid: UUID,
-    db: Session = Depends(get_db),
-):
-    reservation = crud_reservation.get_reservation(db, uid)
-    return ResponseModel(data=reservation)
 
 
 # ------------------------------------------------------------
@@ -60,6 +66,22 @@ def get_guest_reservations(
 ):
     records, total = crud_reservation.get_guest_reservations(db, guest_id, page, limit)
     return ResponseModel(data=records, total=total)
+
+
+# ------------------------------------------------------------
+# READ - single
+# ------------------------------------------------------------
+@router.get(
+    "/{uid}",
+    response_model=ResponseModel[ReservationOut],
+    dependencies=[Depends(require_permission("reservations.view_all"))],
+)
+def get_reservation(
+    uid: UUID,
+    db: Session = Depends(get_db),
+):
+    reservation = crud_reservation.get_reservation(db, uid)
+    return ResponseModel(data=reservation)
 
 
 # ------------------------------------------------------------

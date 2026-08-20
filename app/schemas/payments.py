@@ -4,6 +4,7 @@ from uuid import UUID
 from app.schemas.constants import PAYMENT_TYPES, PAYMENT_STATUSES, PAYMENT_METHODS
 from datetime import datetime
 
+
 class PaymentBase(BaseModel):
     reservation_id: int
     amount: int
@@ -11,16 +12,12 @@ class PaymentBase(BaseModel):
     payment_method: str
     payment_status: str = "pending"
     phone: Optional[str] = None
-    
-    
+
     @field_validator("payment_type")
     def validate_payment_type(cls, v: str) -> str:
         if v not in PAYMENT_TYPES:
-            raise ValueError(
-                f"Invalid payment type. Must be one of {PAYMENT_TYPES}"
-            )
+            raise ValueError(f"Invalid payment type. Must be one of {PAYMENT_TYPES}")
         return v
-
 
     @field_validator("payment_method")
     def validate_payment_method(cls, v: str) -> str:
@@ -54,11 +51,8 @@ class PaymentUpdate(BaseModel):
     @field_validator("payment_type")
     def validate_payment_type(cls, v: str) -> str:
         if v is not None and v not in PAYMENT_TYPES:
-            raise ValueError(
-                f"Invalid payment type. Must be one of {PAYMENT_TYPES}"
-            )
+            raise ValueError(f"Invalid payment type. Must be one of {PAYMENT_TYPES}")
         return v
-
 
     @field_validator("payment_method")
     def validate_payment_method(cls, v: str) -> str:
@@ -75,21 +69,21 @@ class PaymentUpdate(BaseModel):
                 f"Invalid payment status. Must be one of {PAYMENT_STATUSES}"
             )
         return v
-    
-    
+
+
 class PaymentOut(BaseModel):
     id: int
     uid: UUID
     amount: int
     payment_type: str
     payment_method: str
-    checkout_request_id:Optional[str] = None   
-    mpesa_receipt:Optional[str] = None
-    tx_ref:Optional[str] = None
+    checkout_request_id: Optional[str] = None
+    mpesa_receipt: Optional[str] = None
+    tx_ref: Optional[str] = None
     payment_status: str
     paid_at: Optional[datetime] = None
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     model_config = {
         "from_attributes": True,

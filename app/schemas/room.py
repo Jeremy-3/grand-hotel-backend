@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, field_validator
 from typing import Optional, Union
 from uuid import UUID
@@ -44,8 +45,8 @@ class RoomUpdate(BaseModel):
 class RoomOut(RoomBase):
     id: int
     uid: UUID
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     model_config = {
         "from_attributes": True,

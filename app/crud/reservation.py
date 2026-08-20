@@ -91,12 +91,14 @@ class CRUDReservation(CRUDBase[MODEL, ReservationCreate]):
         db_obj = Reservations(
             guest_id=guest.id,
             room_id=room.id,
+            payment_due_at=record_create.payment_due_at,
             check_in_date=check_in_dt,
             check_out_date=check_out_dt,
             status="pending",
             room_price_per_night=room_type.price_per_night,
             deposit_percentage=room_type.deposit_percentage,
             deposit_amount=deposit_amount,
+            total_amount=room_type.price_per_night * nights,
         )
 
         try:
