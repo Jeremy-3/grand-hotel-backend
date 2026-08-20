@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator,
+from pydantic import BaseModel, field_validator
 from typing import Optional, Union
 from uuid import UUID
 from app.schemas.constants import ROOM_TYPES

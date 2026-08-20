@@ -6,7 +6,7 @@ from app.crud.base import CRUDBase
 from app.core.constants import ROLE_GUEST_ID, ROLE_MANAGER_ID
 from app.core.security import hash_password
 from uuid import UUID
-from app.models.managers import Manager
+from app.models.manager import Managers
 
 
 MODEL = Users
@@ -68,9 +68,9 @@ class CRUDUser(CRUDBase[MODEL, UserCreate]):
         db.add(user)
 
         # Create manager profile if not exists
-        existing_manager = db.query(Manager).filter(Manager.user_id == user.id).first()
+        existing_manager = db.query(Managers).filter(Managers.user_id == user.id).first()
         if not existing_manager:
-            new_manager = Manager(user_id=user.id, status="available")
+            new_manager = Managers(user_id=user.id, status="available")
             db.add(new_manager)
 
         db.commit()

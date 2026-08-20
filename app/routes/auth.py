@@ -39,13 +39,13 @@ def login(user_login: Login, db: Session = Depends(get_db)):
         )
     
     # Get role name (handle if role is object or None)
-    role_name = user.role.name if user.role else "customer"
+    role_name = user.role.name if user.role else "GUEST"
     
     # Get permissions (handle if not available)
     permissions = []
     if hasattr(user, 'role') and user.role:
         # Get permissions from role
-        from app.models.role_permission import RolePermission
+        from app.models.role_permissions import RolePermission
         from app.models.permissions import Permissions
         
         role_perms = db.query(Permissions).join(RolePermission).filter(

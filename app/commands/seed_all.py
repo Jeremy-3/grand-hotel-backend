@@ -15,10 +15,14 @@ Seeds:
     - Guests
     - Room Types
     - Rooms
+    - Reservations
+    - Payment
 
-Reservations and Payments are NOT seeded because they should
-be created through the actual hotel booking/payment system.
+Reservations and Payment below are demo/default records for
+development and testing. They are not production transactions.
 """
+
+from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
 
@@ -34,6 +38,8 @@ from app.core.constants import (
     DEFAULT_GUESTS,
     DEFAULT_ROOM_TYPES,
     DEFAULT_ROOMS,
+    DEFAULT_RESERVATIONS,
+    DEFAULT_PAYMENTS,
     ROLE_SUPERADMIN_ID,
 )
 
@@ -48,6 +54,8 @@ from app.models.manager import Managers
 from app.models.guests import Guests
 from app.models.room_types import RoomTypes
 from app.models.rooms import Rooms
+from app.models.reservations import Reservations
+from app.models.payments import Payment
 
 
 # ============================================================
@@ -202,9 +210,7 @@ def seed_superadmin(db):
         name=settings.SUPERADMIN_NAME,
         email=settings.SUPERADMIN_EMAIL,
         phone_number=settings.SUPERADMIN_PHONE,
-        password_hash=hash_password(
-            settings.SUPERADMIN_PASSWORD
-        ),
+        password_hash=hash_password(settings.SUPERADMIN_PASSWORD),
         is_active=True,
         role_id=ROLE_SUPERADMIN_ID,
     )
@@ -312,6 +318,198 @@ def seed_guests(db):
     )
 
 
+
+# ============================================================
+# USERS
+# ============================================================
+
+def seed_users(db):
+    """Seed demo users and hash their development passwords."""
+    print("Seeding users...")
+    created = 0
+
+    for row in DEFAULT_USERS:
+        user_id = row.get("id")
+        email = row.get("email")
+
+        exists = db.get(Users, user_id) if user_id is not None else None
+
+        if not exists and email:
+            exists = (
+                db.query(Users)
+                .filter(Users.email == email)
+                .first()
+            )
+
+        if exists:
+            continue
+
+        data = dict(row)
+        password = data.pop("password", None)
+
+        if "phone" in data:
+            data["phone_number"] = data.pop("phone")
+
+        if password is not None:
+            data["password_hash"] = hash_password(password)
+
+        db.add(Users(**data))
+        created += 1
+
+    db.commit()
+    print(f"✓ Inserted {created} users")
+
+
+# ============================================================
+# RESERVATIONS
+# ============================================================
+
+def seed_reservations(db):
+    """
+    Seed default reservations after guests, room types and rooms.
+
+    Pricing is calculated from RoomTypes so demo reservations
+    remain consistent with the current room pricing.
+    """
+    print("Seeding reservations...")
+    created = 0
+
+    reservation_columns = {
+        column.name
+        for column in Reservations.__table__.columns
+    }
+
+    for row in DEFAULT_RESERVATIONS:
+        reservation_id = row.get("id")
+
+        if reservation_id is not None and db.get(
+            Reservations, reservation_id
+        ):
+            continue
+
+        guest_id = row["guest_id"]
+        room_id = row["room_id"]
+
+        guest = (
+            db.query(Guests)
+            .filter(Guests.id == guest_id)
+            .first()
+        )
+        if not guest:
+            raise ValueError(
+                f"Reservation {reservation_id}: guest {guest_id} not found"
+            )
+
+        room = (
+            db.query(Rooms)
+            .filter(Rooms.id == room_id)
+            .first()
+        )
+        if not room:
+            raise ValueError(
+                f"Reservation {reservation_id}: room {room_id} not found"
+            )
+
+        room_type = (
+            db.query(RoomTypes)
+            .filter(RoomTypes.id == room.room_type_id)
+            .first()
+        )
+        if not room_type:
+            raise ValueError(
+                f"Reservation {reservation_id}: "
+                f"room type for room {room_id} not found"
+            )
+
+        check_in = datetime.fromisoformat(row["check_in_date"])
+        check_out = datetime.fromisoformat(row["check_out_date"])
+
+        nights = (check_out.date() - check_in.date()).days
+
+        if nights <= 0:
+            raise ValueError(
+                f"Reservation {reservation_id}: invalid stay dates"
+            )
+
+        total_amount = room_type.price_per_night * nights
+        deposit_amount = round(
+            total_amount * room_type.deposit_percentage / 100
+        )
+
+        reservation_data = {
+            "id": reservation_id,
+            "guest_id": guest_id,
+            "room_id": room_id,
+            "check_in_date": check_in,
+            "check_out_date": check_out,
+            "status": row.get("status", "pending"),
+            "room_price_per_night": room_type.price_per_night,
+            "deposit_percentage": room_type.deposit_percentage,
+            "deposit_amount": deposit_amount,
+        }
+
+        if "total_amount" in reservation_columns:
+            reservation_data["total_amount"] = total_amount
+
+        if "payment_due_at" in reservation_columns:
+            reservation_data["payment_due_at"] = check_in
+
+        db.add(Reservations(**reservation_data))
+        created += 1
+
+    db.commit()
+    print(f"✓ Inserted {created} reservations")
+
+
+# ============================================================
+# Payment
+# ============================================================
+
+def seed_Payment(db):
+    """Seed default payment records after reservations exist."""
+    print("Seeding Payment...")
+    created = 0
+
+    payment_columns = {
+        column.name
+        for column in Payment.__table__.columns
+    }
+
+    for row in DEFAULT_PAYMENTS:
+        payment_id = row.get("id")
+
+        if payment_id is not None and db.get(
+            Payment, payment_id
+        ):
+            continue
+
+        reservation_id = row.get("reservation_id")
+
+        reservation = (
+            db.query(Reservations)
+            .filter(Reservations.id == reservation_id)
+            .first()
+        )
+
+        if not reservation:
+            raise ValueError(
+                f"Payment {payment_id}: "
+                f"reservation {reservation_id} not found"
+            )
+
+        payment_data = {
+            key: value
+            for key, value in row.items()
+            if key in payment_columns
+        }
+
+        db.add(Payment(**payment_data))
+        created += 1
+
+    db.commit()
+    print(f"✓ Inserted {created} Payment")
+
+
 # ============================================================
 # MAIN SEED
 # ============================================================
@@ -393,12 +591,7 @@ def seed_all():
             print("USERS")
             print("-" * 60)
 
-            seed_table(
-                db,
-                Users,
-                DEFAULT_USERS,
-                "users",
-            )
+            seed_users(db)
 
             # =================================================
             # MANAGERS
@@ -459,31 +652,17 @@ def seed_all():
             print("RESERVATIONS")
             print("-" * 60)
 
-            print(
-                "ℹ️ Reservations are not seeded."
-            )
-
-            print(
-                "   Reservations should be created "
-                "through the booking system."
-            )
+            seed_reservations(db)
 
             # =================================================
-            # PAYMENTS
+            # Payment
             # =================================================
 
             print("\n" + "-" * 60)
-            print("PAYMENTS")
+            print("Payment")
             print("-" * 60)
 
-            print(
-                "ℹ️ Payments are not seeded."
-            )
-
-            print(
-                "   Payments should be created when "
-                "a reservation is made."
-            )
+            seed_Payment(db)
 
             # =================================================
             # COMPLETE
@@ -523,4 +702,3 @@ def seed_all():
 
 if __name__ == "__main__":
     seed_all()
-

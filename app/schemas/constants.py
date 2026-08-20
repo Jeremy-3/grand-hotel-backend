@@ -26,7 +26,7 @@ ROOM_TYPES = {
     "Executive / Club",
 }
 
-ROOM_STATUSES = {
+ROOM_AVAILABILITY_STATUSES = {
     "available",
     "reserved",
     "occupied",

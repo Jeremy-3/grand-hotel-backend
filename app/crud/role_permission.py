@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException, status
-from app.models.role_permission import RolePermission
+from app.models.role_permissions import RolePermission
 from app.models.roles import Roles
 from app.models.permissions import Permissions
 from app.schemas.role_permission import RolePermissionAssign, RolePermissionDeassignOut
