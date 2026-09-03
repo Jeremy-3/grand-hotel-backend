@@ -336,11 +336,15 @@ def seed_users(db):
     for row in DEFAULT_USERS:
         user_id = row.get("id")
         email = row.get("email")
+        phone = row.get("phone") or row.get("phone_number")
 
         exists = db.get(Users, user_id) if user_id is not None else None
 
         if not exists and email:
             exists = db.query(Users).filter(Users.email == email).first()
+
+        if not exists and phone:
+            exists = db.query(Users).filter(Users.phone_number == phone).first()
 
         if exists:
             continue
