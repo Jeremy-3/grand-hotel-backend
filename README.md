@@ -235,6 +235,128 @@ Confirm PostgreSQL is running, the database exists, and `DATABASE_URL` is correc
 - Run `alembic upgrade head` during deployment.
 - Never use demo seed passwords in production.
 
+## Deploy the Backend to Render
+
+The backend can run on a Render Web Service while Supabase provides the managed
+PostgreSQL database. Create the Supabase project first, then create a Render
+service from this repository.
+
+### Supabase database
+
+1. Create a Supabase project and open **Connect**.
+2. Copy a PostgreSQL connection string. For Render, prefer the Supavisor
+   session-pooler connection string when the direct database host is not
+   reachable over IPv4.
+3. Replace the password with the database password for the project. URL-encode
+   special characters in the password.
+4. Add `?sslmode=require` if the copied connection string does not already
+   include SSL mode.
+
+Keep the connection string private. Supabase is the database provider; the
+FastAPI application and migrations still run from Render.
+
+### Render Web Service
+
+Use these settings for a Python Web Service:
+
+| Setting           | Value                                                                          |
+| ----------------- | ------------------------------------------------------------------------------ |
+| Root directory    | `grand-hotel-backend` when deploying from the repository root; otherwise blank |
+| Runtime           | Python 3                                                                       |
+| Build command     | `pip install -r requirements.txt`                                              |
+| Start command     | `uvicorn main:app --host 0.0.0.0 --port $PORT`                                 |
+| Health check path | `/`                                                                            |
+
+Add every variable from the production environment template below in Render's
+**Environment** tab. Render supplies `PORT`; do not hard-code it in the start
+command. Set `APP_ENV=production`, `DEBUG=false`, a long random
+`JWT_SECRET_KEY`, the Supabase `DATABASE_URL`, and production payment callback
+URLs when payments are enabled.
+
+Run the migration after the first deploy from a Render Shell, or use a one-off
+deployment job with:
+
+```bash
+alembic upgrade head
+```
+
+Do not run the development seeder on the production database. Open the Render
+service URL and verify `/` and `/docs` before connecting the frontend.
+
+### Production environment template
+
+Required values:
+
+```dotenv
+APP_ENV=production
+DEBUG=false
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/postgres?sslmode=require
+JWT_SECRET_KEY=generate-a-long-random-value
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_SECONDS=14400
+SUPERADMIN_NAME=Hotel Administrator
+SUPERADMIN_EMAIL=admin@example.com
+SUPERADMIN_PHONE=0700000000
+SUPERADMIN_PASSWORD=use-a-unique-password
+```
+
+Payment variables are optional until the corresponding provider is configured:
+
+```dotenv
+MPESA_ENV=production
+MPESA_CONSUMER_KEY=...
+MPESA_CONSUMER_SECRET=...
+MPESA_SHORTCODE=...
+MPESA_PASSKEY=...
+MPESA_CALLBACK_URL=https://YOUR-RENDER-SERVICE.onrender.com/api/...
+
+FLW_ENV=production
+FLW_PUBLIC_KEY=...
+FLW_SECRET_KEY=...
+FLW_ENCRYPTION_KEY=...
+FLW_CALLBACK_URL=https://YOUR-RENDER-SERVICE.onrender.com/api/...
+FLW_REDIRECT_URL=https://YOUR-VERCEL-APP.vercel.app/...
+```
+
+The exact callback paths depend on the payment integration being used. Use
+HTTPS URLs and register the same URLs in the provider dashboard.
+
+### CORS before going live
+
+`main.py` currently allows all origins for development. Before production,
+replace the wildcard with the deployed Vercel origin, for example
+`https://your-hotel-app.vercel.app`, and redeploy. Because credentials are
+enabled, never leave wildcard CORS in a public production deployment.
+
+## Railway Evaluation
+
+Railway can host the same service if it becomes preferable to Render. Use the
+backend directory as the service root, set the same environment variables, and
+use:
+
+```bash
+pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
+Continue using Supabase as the database unless Railway PostgreSQL is explicitly
+chosen. Run `alembic upgrade head` once against the selected production
+database. Do not run both Render and Railway against the same live database at
+the same time without a deliberate migration and traffic plan.
+
+## Deployment Checklist
+
+- [ ] Supabase project created and database connection tested
+- [ ] Render service deployed with the production start command
+- [ ] All required environment variables added in Render
+- [ ] `alembic upgrade head` completed successfully
+- [ ] Superadmin account created with a unique password
+- [ ] Production CORS origin set to the Vercel URL
+- [ ] `/` and `/docs` respond from the deployed API
+- [ ] Frontend `VITE_API_URL` points to the deployed API `/api`
+- [ ] Payment provider callbacks use HTTPS and the deployed URLs
+- [ ] No `.env` files, secrets, or development seed data committed
+
 ## Development Checklist
 
 ```bash
