@@ -21,7 +21,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten this to your actual frontend origin(s) before production
+    allow_origins=["https://grand-hotel-chi.vercel.app/"],  # tighten this to your actual frontend origin(s) before production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
